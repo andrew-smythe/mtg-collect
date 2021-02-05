@@ -8,7 +8,7 @@ const routes = [
   {
     path: "/",
     name: "Home",
-    component: Home
+    component: Home,
   },
   {
     path: "/about",
@@ -22,7 +22,8 @@ const routes = [
 ];
 
 const router = new VueRouter({
-  routes
+    mode: 'history',
+    routes
 });
 
 export default router;
