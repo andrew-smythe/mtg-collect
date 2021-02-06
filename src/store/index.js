@@ -14,6 +14,7 @@ export default new Vuex.Store({
         baseSearchParams: 'order=name&q=layout%3Anormal',
         noCardsFound: false,
         symbology: [],
+        decks: [],
     },
     getters: {},
     mutations: {
@@ -31,6 +32,21 @@ export default new Vuex.Store({
         },
         updateSymbology (state, payload) {
             state.symbology = payload;
+        },
+        createNewDeck (state, { name, cards }) {
+            state.decks.push({ name, cards });
+        },
+        addCardsToDeck (state, { deck, card, quantity }) {
+            // Check if card exists in deck already
+            let cardIndex = state.decks[deck].cards.findIndex(c => c.name === card);
+
+            // Update card quantity
+            if (cardIndex >= 0) {
+                Vue.set(state.decks[deck].cards[cardIndex], 'quantity', state.decks[deck].cards[cardIndex].quantity + quantity);
+            }
+            else {
+                state.decks[deck].cards.push({ name: card, quantity: quantity });
+            }
         }
     },
     actions: {

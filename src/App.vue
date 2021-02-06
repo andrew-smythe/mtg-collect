@@ -6,6 +6,9 @@
       dark
     >
         <v-app-bar-nav-icon @click.stop="navigation = !navigation"></v-app-bar-nav-icon>
+        <span class="ml-3 title">mtg-collect</span>
+        <v-spacer></v-spacer>
+        <span class="caption ml-3">A Magic the Gathering Card Searcher / Deck Organizer</span>
     </v-app-bar>
         <v-navigation-drawer
             app
