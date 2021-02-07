@@ -29,7 +29,7 @@
                                         :src="img.src"
                                         style="width: 15px; height: 15px"
                                     />
-                                    <span v-else :key="key">{{ item.mana_cost }}</span>
+                                    <span v-else :key="key">{{ card.mana_cost }}</span>
                                 </template>
                             </v-list-item-subtitle>
                         </v-list-item-content>

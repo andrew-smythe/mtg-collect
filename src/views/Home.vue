@@ -87,13 +87,13 @@
                             v-if="!!selectedDeck"
                             solo
                             type="number"
-                            :rules="[deckAddRules]"
+                            :rules="[deckMaxCardRules, deckMinCardRules]"
                             v-model="newCardQuantity"
                         ></v-text-field>
                     </v-form>
                 </v-card-text>
                 <v-card-actions class="justify-center pt-0 mt-0 pb-3">
-                    <v-btn color="green" dark @click="saveDeck" :disabled="!newDeckName || !selectedDeck">Save Deck</v-btn>
+                    <v-btn color="green" dark @click="saveDeck" :disabled="!selectedDeck || (!newDeckName && selectedDeck === 'Create New Deck')">Save Deck</v-btn>
                     <v-btn color="red" dark @click="addToDeckDialog = false">Close</v-btn>
                 </v-card-actions>
             </v-card>
@@ -161,6 +161,8 @@ export default {
           cardsInDeck: 0,
           newDeckName: '',
           newCardQuantity: 0,
+
+          deckMinCardRules: v => !!v && v > 0 || 'You must add at least 1 card.',
       }
   },
   computed: {
@@ -184,7 +186,7 @@ export default {
           decks.unshift({ name: 'Create New Deck', cards: [] });
           return decks;
       },
-      deckAddRules: function () {
+      deckMaxCardRules: function () {
           if (this.cardToAdd.type_line.includes('Basic')) {
               return true;
           }
@@ -238,6 +240,7 @@ export default {
             this.cardsInDeck = 0;
         }
         else {
+            this.newDeckName = '';
             let deck = this.decks.find(d => d.name === name);
             let card = deck.cards.find(c => c.name === this.cardToAdd.name);
             this.cardsInDeck = !!card ? card.quantity : 0;
