@@ -10,58 +10,58 @@
         <v-spacer></v-spacer>
         <span class="caption ml-3">A Magic the Gathering Card Searcher / Deck Organizer</span>
     </v-app-bar>
-        <v-navigation-drawer
-            app
-            v-model="navigation"
-            absolute
-            temporary
-        >
-            <v-list nav dense>
-                <v-list-item two-line>
-                    <v-list-item-avatar class="mr-3">
-                        <img :src="logo">
-                    </v-list-item-avatar>
+    <v-navigation-drawer
+        app
+        v-model="navigation"
+        fixed
+        temporary
+    >
+        <v-list nav dense>
+            <v-list-item two-line>
+                <v-list-item-avatar class="mr-3">
+                    <img :src="logo">
+                </v-list-item-avatar>
 
-                    <v-list-item-content>
-                        <v-list-item-title class="d-flex align-center">mtg-collect</v-list-item-title>
-                        <v-list-item-subtitle>By Andrew Smythe</v-list-item-subtitle>
-                    </v-list-item-content>
-                </v-list-item>
+                <v-list-item-content>
+                    <v-list-item-title class="d-flex align-center">mtg-collect</v-list-item-title>
+                    <v-list-item-subtitle>By Andrew Smythe</v-list-item-subtitle>
+                </v-list-item-content>
+            </v-list-item>
 
-                <v-divider></v-divider>
+            <v-divider></v-divider>
 
-                <v-list-item
-                    v-for="(item, key) in menu"
-                    :key="key"
-                    link
-                    :href="item.href"
-                    :to="item.route"
-                    :target="!!item.href ? 'blank' : ''"
-                >
-                    <v-list-item-icon class="ml-2 mr-5">
-                        <v-icon>{{ item.icon }}</v-icon>
-                    </v-list-item-icon>
-                    
-                    <v-list-item-content>
-                        <v-list-item-title>{{ item.text }}</v-list-item-title>
-                    </v-list-item-content>
-                </v-list-item>
+            <v-list-item
+                v-for="(item, key) in menu"
+                :key="key"
+                link
+                :href="item.href"
+                :to="item.route"
+                :target="!!item.href ? 'blank' : ''"
+            >
+                <v-list-item-icon class="ml-2 mr-5">
+                    <v-icon>{{ item.icon }}</v-icon>
+                </v-list-item-icon>
+                
+                <v-list-item-content>
+                    <v-list-item-title>{{ item.text }}</v-list-item-title>
+                </v-list-item-content>
+            </v-list-item>
 
-                <v-divider></v-divider>
-            </v-list>
-            
-            <div class="d-flex justify-center align-end mt-5">
-                <a href="https://www.vuejs.org" target="blank">
-                    <img style="max-width: 100px" :src="vueLogo">
-                </a>
-            </div>
+            <v-divider></v-divider>
+        </v-list>
+        
+        <div class="d-flex justify-center align-end mt-5">
+            <a href="https://www.vuejs.org" target="blank">
+                <img style="max-width: 100px" :src="vueLogo">
+            </a>
+        </div>
 
-            <div class="d-flex justify-center mt-5">
-                <a href="https://www.vuetifyjs.com" target="blank">
-                    <img style="max-width: 100px" :src="vuetifyLogo">
-                </a>
-            </div>
-        </v-navigation-drawer>
+        <div class="d-flex justify-center mt-5">
+            <a href="https://www.vuetifyjs.com" target="blank">
+                <img style="max-width: 100px" :src="vuetifyLogo">
+            </a>
+        </div>
+    </v-navigation-drawer>
 
     <v-main>
         <v-container>
@@ -70,6 +70,14 @@
     </v-main>
   </v-app>
 </template>
+
+<style>
+
+.v-navigation-drawer {
+z-index: 999999 !important;
+}
+
+</style>
 
 <script>
 

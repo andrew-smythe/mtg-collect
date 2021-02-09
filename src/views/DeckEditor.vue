@@ -11,12 +11,10 @@
                         :items="decks"
                         v-model="selectedDeck"
                     ></v-select>
-                    <span class="font-weight-bold" v-if="resultCards.length > 0">Number of Cards in Deck: {{ numCardsInDeck }}</span>
+                    <p class="font-weight-bold" v-if="resultCards.length > 0">Number of Cards in Deck: {{ numCardsInDeck }}</p>
+                    <v-btn color="red" dark v-if="!!selectedDeck" @click="deleteDeck(selectedDeck)">Delete this Deck</v-btn>
                 </v-card-text>
                 <v-card-text class="justify-center d-flex align-center">
-                    
-                    <!-- Loading -->
-                    <v-progress-circular size="300" width="8" color="primary" indeterminate v-if="loadingSearch">Searching...</v-progress-circular>
 
                     <!-- Results -->
                     <v-data-table
@@ -44,6 +42,26 @@
                             </template>
                         </template>
 
+                        <template v-slot:[`item.quantity`]="{ item }">
+                            <v-row justify="center" align="center" class="pa-2">
+                                <v-btn x-small icon @click.stop="reduceQuantity(item)">
+                                    <v-icon x-small>fa-chevron-down</v-icon>
+                                </v-btn>
+                                <v-text-field 
+                                    v-model="item.quantity"
+                                    solo 
+                                    disabled
+                                    style="max-width:40px" 
+                                    hide-details 
+                                    class="ma-2"
+                                >
+                                </v-text-field>
+                                <v-btn x-small icon @click.stop="increaseQuantity(item)">
+                                    <v-icon x-small>fa-chevron-up</v-icon>
+                                </v-btn>
+                            </v-row>
+                        </template>
+
                         <template v-slot:[`item.remove`]="{ item }">
                             <v-btn x-small fab color="red" @click.stop="removeCardFromDeck(item.name)" dark class="pa-0">
                                 <v-icon x-small>fa-trash</v-icon>
@@ -57,6 +75,9 @@
                         </template>
 
                     </v-data-table>  
+                    
+                    <!-- Loading -->
+                    <v-progress-circular size="300" width="8" color="primary" indeterminate v-if="loadingSearch">Loading</v-progress-circular>
                 </v-card-text>
             </v-card>
         </v-col>
@@ -186,8 +207,28 @@ export default {
           if (deckIndex >= 0) {
               this.$store.commit('removeCardFromDeck', { deck: deckIndex, card: card, quantity: 0 });
           }
+      },
+      reduceQuantity: function (card) {
+          if (card.quantity > 1) {
+              let deckIndex = this.decks.findIndex(d => d.name === this.selectedDeck.name);
 
-          console.log(card);
+              if (deckIndex >= 0) {
+                  this.$store.commit('removeCardFromDeck', { deck: deckIndex, card: card.name, quantity: 1 });
+              }
+          }
+      },
+      increaseQuantity: function (card) {
+          if (card.type_line.indexOf('Basic') >= 0 || card.quantity < 4) {
+              let deckIndex = this.decks.findIndex(d => d.name === this.selectedDeck.name);
+
+              if (deckIndex >= 0) {
+                  this.$store.commit('addCardsToDeck', { deck: deckIndex, card: card.name, quantity: 1 });
+              }
+          }
+      },
+      deleteDeck: function (deck) {
+          this.$store.commit('removeDeck', deck.name);
+          this.selectedDeck = null;
       }
     },
     watch: {
@@ -204,18 +245,20 @@ export default {
             // testing exercise, this is not the strategy I am going to use as it would take quite
             // a bit more time to implement.
 
-            for (let i = 0; i < Math.ceil(this.selectedDeck.cards.length / 6); i++) {
-                // Prepare query for cards in deck
-                console.log(i*6, (i*6)+6);
-                console.log(this.selectedDeck.cards.slice(i*6, (i*6)+6).map(c => c.name));
-                this.searchTerm = '/^' + this.selectedDeck.cards.slice(i*6, (i*6)+6).map(c => c.name).join('$/%20OR%20name%3A/^') + '$/'
-                this.searchTerm = this.searchTerm.replace(/ /g, '%20');
-                
-                // Send query
-                this.$store.dispatch('getCards');
+            if (this.selectedDeck != null) {
+                this.$store.commit('clearSearchState');
 
-                // Wait 75ms
-                await new Promise(s => setTimeout(s, 75));
+                for (let i = 0; i < Math.ceil(this.selectedDeck.cards.length / 6); i++) {
+                    // Prepare query for cards in deck
+                    this.searchTerm = '/^' + this.selectedDeck.cards.slice(i*6, (i*6)+6).map(c => c.name).join('$/%20OR%20name%3A/^') + '$/'
+                    this.searchTerm = this.searchTerm.replace(/ /g, '%20');
+                    
+                    // Send query
+                    this.$store.dispatch('getCards');
+
+                    // Wait 75ms
+                    await new Promise(s => setTimeout(s, 75));
+                }
             }
         }
     },

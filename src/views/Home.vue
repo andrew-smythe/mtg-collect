@@ -8,6 +8,7 @@
                             <v-btn color="primary" dark class="ml-2" @click="executeSearch()">Go</v-btn>
                         </template>
                     </v-text-field>
+                    <span class="caption font-italic">* This search will only return the top 175 results</span>
                 </v-card-text>
                 <v-card-text class="justify-center d-flex align-center">
                     

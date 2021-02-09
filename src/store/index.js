@@ -1,5 +1,6 @@
 import Vue from "vue";
 import Vuex from "vuex";
+import deckData from "../assets/decks.json";
 
 const axios = require('axios');
 
@@ -14,7 +15,7 @@ export default new Vuex.Store({
         baseSearchParams: 'order=name&q=layout%3Anormal',
         noCardsFound: false,
         symbology: [],
-        decks: [],
+        decks: deckData,
         clearResultsOnNewSearch: true,
     },
     getters: {},
@@ -33,8 +34,7 @@ export default new Vuex.Store({
                 // Check if each card already exists in results. If it does not,
                 // add it to the list
                 for (let card of newCards) {
-                    console.log('trying to add ' + card.name);
-                    console.log('does it already exist?', !!state.resultCards.find(c => c.name === card.name));
+                    
                     if (!state.resultCards.find(c => c.name === card.name)) {
                         state.resultCards.push(card);
                     }
@@ -74,16 +74,18 @@ export default new Vuex.Store({
             if (cardIndex >= 0) {
                 // Remove all cards from deck
                 if (quantity === 0) {
-                    console.log('quantity zero - delete from deck!');
                     Vue.delete(state.decks[deck].cards, cardIndex);
+
+                    let cardResultIndex = state.resultCards.findIndex(c => c.name === card);
+        
+                    if (cardResultIndex >= 0) {
+                        // remove card from result set
+                        Vue.delete(state.resultCards, cardResultIndex);
+                    }
                 }
-            }
-
-            let cardResultIndex = state.resultCards.findIndex(c => c.name === card);
-
-            if (cardResultIndex >= 0) {
-                // remove card from result set
-                Vue.delete(state.resultCards, cardResultIndex);
+                else {
+                    Vue.set(state.decks[deck].cards[cardIndex], 'quantity', state.decks[deck].cards[cardIndex].quantity - 1);
+                }
             }
 
             // Save to local storage
@@ -100,6 +102,17 @@ export default new Vuex.Store({
         },
         updateClearSearchFlag (state, val) {
             state.clearResultsOnNewSearch = val;
+        },
+        removeDeck (state, deckName) {
+            let deckIndex = state.decks.findIndex(d => d.name === deckName);
+
+            if (deckIndex >= 0) {
+                Vue.delete(state.decks, deckIndex);
+                state.resultCards = [];
+            }
+
+            // Save to local storage
+            localStorage.decks = JSON.stringify(state.decks);
         }
     },
     actions: {
