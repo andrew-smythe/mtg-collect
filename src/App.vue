@@ -102,5 +102,9 @@ export default {
         }
     ]
   }),
+  created: function () {
+      this.$store.commit('loadDecksFromLocalStorage');
+      this.$store.dispatch('getSymbology');
+  },
 };
 </script>

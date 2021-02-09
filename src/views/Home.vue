@@ -9,7 +9,7 @@
                         </template>
                     </v-text-field>
                 </v-card-text>
-                <v-card-text style="min-height: 600px" class="justify-center d-flex align-center">
+                <v-card-text class="justify-center d-flex align-center">
                     
                     <!-- Loading -->
                     <v-progress-circular size="300" width="8" color="primary" indeterminate v-if="loadingSearch">Searching...</v-progress-circular>
@@ -42,7 +42,7 @@
 
                         <template v-slot:[`item.add`]="{ item }">
                             <v-btn x-small fab color="green" @click.stop="addCardToDeck(item)" dark class="pa-0">
-                                <v-icon small>fa-plus</v-icon>
+                                <v-icon x-small>fa-plus</v-icon>
                             </v-btn>
                         </template>
 
@@ -274,11 +274,12 @@ export default {
           }
       }
   },
-  created: function () {
-      this.$store.dispatch('getSymbology');
-  },
   components: {
       Card,
+  },
+  mounted: function () {
+      this.$store.commit('clearSearchState');
+      this.$store.commit('updateClearSearchFlag', true);
   }
 };
 </script>

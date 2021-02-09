@@ -15,26 +15,43 @@ export default new Vuex.Store({
         noCardsFound: false,
         symbology: [],
         decks: [],
+        clearResultsOnNewSearch: true,
     },
     getters: {},
     mutations: {
-        updateSearchTerm (state, payload) {
-            state.searchTerm = payload;
+        updateSearchTerm (state, val) {
+            state.searchTerm = val;
         },
-        updateLoadingSearch (state, payload) {
-            state.loadingSearch = payload;
+        updateLoadingSearch (state, val) {
+            state.loadingSearch = val;
         },
-        updateCardResults (state, payload) {
-            state.resultCards = payload;
+        updateCardResults (state, newCards) {
+            if (!!state.clearResultsOnNewSearch) {
+                state.resultCards = newCards;
+            }
+            else {
+                // Check if each card already exists in results. If it does not,
+                // add it to the list
+                for (let card of newCards) {
+                    console.log('trying to add ' + card.name);
+                    console.log('does it already exist?', !!state.resultCards.find(c => c.name === card.name));
+                    if (!state.resultCards.find(c => c.name === card.name)) {
+                        state.resultCards.push(card);
+                    }
+                }
+            }
         },
-        updateNoCardsFound (state, payload) {
-            state.noCardsFound = payload;
+        updateNoCardsFound (state, val) {
+            state.noCardsFound = val;
         },
-        updateSymbology (state, payload) {
-            state.symbology = payload;
+        updateSymbology (state, val) {
+            state.symbology = val;
         },
         createNewDeck (state, { name, cards }) {
             state.decks.push({ name, cards });
+
+            // Save to local storage
+            localStorage.decks = JSON.stringify(state.decks);
         },
         addCardsToDeck (state, { deck, card, quantity }) {
             // Check if card exists in deck already
@@ -47,12 +64,49 @@ export default new Vuex.Store({
             else {
                 state.decks[deck].cards.push({ name: card, quantity: quantity });
             }
+
+            // Save to local storage
+            localStorage.decks = JSON.stringify(state.decks);
+        },
+        removeCardFromDeck (state, { deck, card, quantity }) {
+            let cardIndex = state.decks[deck].cards.findIndex(c => c.name === card);
+            
+            if (cardIndex >= 0) {
+                // Remove all cards from deck
+                if (quantity === 0) {
+                    console.log('quantity zero - delete from deck!');
+                    Vue.delete(state.decks[deck].cards, cardIndex);
+                }
+            }
+
+            let cardResultIndex = state.resultCards.findIndex(c => c.name === card);
+
+            if (cardResultIndex >= 0) {
+                // remove card from result set
+                Vue.delete(state.resultCards, cardResultIndex);
+            }
+
+            // Save to local storage
+            localStorage.decks = JSON.stringify(state.decks);
+        },
+        clearSearchState (state) {
+            state.searchTerm = '';
+            state.resultCards = [];
+        },
+        loadDecksFromLocalStorage (state) {
+            if (!!localStorage.decks) {
+                state.decks = JSON.parse(localStorage.decks);
+            }
+        },
+        updateClearSearchFlag (state, val) {
+            state.clearResultsOnNewSearch = val;
         }
     },
     actions: {
         async getCards({ state, commit }) {
             commit('updateLoadingSearch', true);
             commit('updateNoCardsFound', false);
+
             await axios.get(state.scryfallApi + 'cards/search?' + state.baseSearchParams + '+name%3D' + state.searchTerm).then(response => {
                 commit('updateCardResults', response.data.data);
             })
