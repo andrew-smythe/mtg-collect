@@ -30,6 +30,6 @@ npm install
 npm run build
 ```
 
-### First Run
+## First Run
 
 If there have been no saves to local storage when ***mtg-collect*** is loaded, 2 decks are automatically loaded into the Deck Builder view from a JSON file. After that, whatever changes are made will be maintained with local storage.
